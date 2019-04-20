@@ -4,6 +4,8 @@ import traceback
 import os
 import mimetypes
 
+CWD = 'webroot'
+
 
 def response_ok(body=b"This is a minimal response", mimetype=b"text/plain"):
     """
@@ -94,28 +96,20 @@ def response_path(path):
 
     """
 
-    if not os.path.exists('webroot' + path):
+    new_location = os.path.join(CWD, path.lstrip("/"))
+
+    if not os.path.exists(new_location):
         raise NameError
 
-    if os.path.isdir('webroot' + path):
-        content = "\n".join(os.listdir('webroot' + path)).encode()
+    if os.path.isdir(new_location):
+        content = "\n".join(os.listdir(new_location)).encode()
         mime_type = b"text/plain"
     else:
-        with open('webroot' + path, "rb") as file:
+        with open(new_location, "rb") as file:
             content = file.read()
             mime_type = mimetypes.guess_type(path)[0].encode()
 
-        # TODO: Fill in the appropriate content and mime_type give the path.
-        # See the assignment guidelines for help on "mapping mime-types", though
-        # you might need to create a special case for handling make_time.py
-        #
-        # If the path is "make_time.py", then you may OPTIONALLY return the
-        # result of executing `make_time.py`. But you need only return the
-        # CONTENTS of `make_time.py`.
-
-        # content = b"not implemented"
-        # mime_type = b"not implemented"
-
+    print(mime_type)
     return content, mime_type
 
 
@@ -149,15 +143,6 @@ def server(log_buffer=sys.stderr):
 
                     content, mimetype = response_path(path)
 
-                    # TODO; If parse_request raised a NotImplementedError, then let
-                    # response be a method_not_allowed response. If response_path raised
-                    # a NameError, then let response be a not_found response. Else,
-                    # use the content and mimetype from response_path to build a
-                    # response_ok.
-                    # response = response_ok(
-                    #     body=b"Welcome to my web server",
-                    #     mimetype=b"text/plain"
-                    # )
                     response = response_ok(
                         body=content,
                         mimetype=mimetype
@@ -183,5 +168,3 @@ def server(log_buffer=sys.stderr):
 if __name__ == '__main__':
     server()
     sys.exit(0)
-
-
