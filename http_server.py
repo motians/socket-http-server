@@ -3,7 +3,6 @@ import sys
 import traceback
 import os
 import mimetypes
-import importlib
 
 CWD = 'webroot'
 
