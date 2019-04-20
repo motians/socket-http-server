@@ -98,9 +98,12 @@ def response_path(path):
         raise NameError
 
     if os.path.isdir('webroot' + path):
-        content = "\n".join(os.listdir('webroot' + path))
-        mime_type = "text/plain"
+        content = "\n".join(os.listdir('webroot' + path)).encode()
+        mime_type = b"text/plain"
     else:
+        with open('webroot' + path, "rb") as file:
+            content = file.read()
+            mime_type = mimetypes.guess_type(path)[0].encode()
 
         # TODO: Fill in the appropriate content and mime_type give the path.
         # See the assignment guidelines for help on "mapping mime-types", though
@@ -110,8 +113,8 @@ def response_path(path):
         # result of executing `make_time.py`. But you need only return the
         # CONTENTS of `make_time.py`.
 
-        content = b"not implemented"
-        mime_type = b"not implemented"
+        # content = b"not implemented"
+        # mime_type = b"not implemented"
 
     return content, mime_type
 
@@ -156,8 +159,8 @@ def server(log_buffer=sys.stderr):
                     #     mimetype=b"text/plain"
                     # )
                     response = response_ok(
-                        body=content.encode(),
-                        mimetype=mimetype.encode()
+                        body=content,
+                        mimetype=mimetype
                     )
                 except NotImplementedError:
                     response = response_method_not_allowed()
