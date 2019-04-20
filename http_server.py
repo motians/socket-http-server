@@ -3,6 +3,7 @@ import sys
 import traceback
 import os
 import mimetypes
+import importlib
 
 CWD = 'webroot'
 
@@ -27,7 +28,7 @@ def response_ok(body=b"This is a minimal response", mimetype=b"text/plain"):
     response = b"HTTP/1.1 200 OK\r\n"
     response += b"Content-Type: " + mimetype + b"\r\n"
     response += b"\r\n"
-    response += body + b"\r\n"
+    response += body
 
     return response
 
@@ -104,12 +105,14 @@ def response_path(path):
     if os.path.isdir(new_location):
         content = "\n".join(os.listdir(new_location)).encode()
         mime_type = b"text/plain"
+    elif new_location.rsplit(".", 1)[1] == 'py':
+        content = os.popen('python {}'.format(new_location)).read().encode()
+        mime_type = b"text/html"
     else:
         with open(new_location, "rb") as file:
             content = file.read()
             mime_type = mimetypes.guess_type(path)[0].encode()
 
-    print(mime_type)
     return content, mime_type
 
 
